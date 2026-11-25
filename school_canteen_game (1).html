@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مقصف المدرسة | تحدّي المعرفة</title>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.12.3/brython.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.12.3/brython_stdlib.js"></script>
+<style>
+:root{--cream:#fff5d9;--cream2:#ffedbd;--brown:#765037;--onion:#a66b43;--olive:#66713b;--ink:#30271f;--white:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:Tahoma,Arial,sans-serif}
+button,input{font-family:inherit}
+button{border:0;border-radius:15px;padding:12px 18px;background:var(--brown);color:white;font-weight:bold;cursor:pointer;box-shadow:0 4px 0 #4e3424;transition:.15s}
+button:active{transform:translateY(3px);box-shadow:0 1px 0 #4e3424}
+button.olive{background:var(--olive);box-shadow:0 4px 0 #424a26}
+button.onion{background:var(--onion);box-shadow:0 4px 0 #75492d}
+button.light{background:#f2dfb5;color:var(--ink);box-shadow:0 4px 0 #c9b58d}
+button:disabled{opacity:.45;cursor:not-allowed}
+.page{display:none;min-height:100vh;padding:22px 16px 35px}
+.page.active{display:block}
+.wrap{width:min(100%,850px);margin:auto}
+h1,h2,h3{text-align:center}
+h1{font-size:clamp(2rem,8vw,3.6rem);color:#17130f;margin:16px 0}
+h2{font-size:1.65rem}
+p{text-align:center;line-height:1.8}
+.hero{min-height:85vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.logo{font-size:5rem;filter:drop-shadow(0 5px 2px #c9b58d)}
+.subtitle{font-size:1.15rem;max-width:520px}
+.panel{background:#fffaf0;border:2px solid #ead8ad;border-radius:24px;padding:20px;box-shadow:0 8px 24px #75502a16}
+.namebox{max-width:440px;margin:35px auto}
+input{width:100%;padding:14px;border:2px solid #d8c49a;border-radius:14px;background:white;font-size:1rem}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.topbar strong{font-size:1.05rem}
+.canteen{position:relative;overflow:hidden;border:4px solid #8d6847;border-radius:24px;background:linear-gradient(#b8d7d0 0 36%,#f3d9a4 36% 100%);min-height:225px;padding:15px;margin-bottom:18px}
+.canteen:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 75px,#ffffff28 76px 78px);pointer-events:none}
+.sign{position:relative;margin:auto;width:max-content;max-width:90%;background:#765037;color:white;padding:8px 25px;border-radius:8px;font-size:1.35rem;font-weight:bold;box-shadow:0 5px 0 #4b3426}
+.window{position:relative;margin:15px auto 0;background:#fff8e8;border:8px solid #a66b43;border-radius:12px;height:100px;max-width:540px;display:flex;align-items:center;justify-content:space-around}
+.vendor{font-size:4.2rem;filter:drop-shadow(0 4px 1px #777)}
+.counter{position:absolute;bottom:-2px;left:5%;right:5%;height:28px;background:#9b633e;border-radius:12px 12px 0 0}
+.canteen-note{position:relative;font-weight:bold;background:#fff9e9b8;padding:4px 10px;border-radius:9px;display:inline-block}
+.shop-layout{display:grid;grid-template-columns:1fr;gap:14px}
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.food{background:#fffaf0;border:2px solid #ead8ad;border-radius:18px;padding:12px;text-align:center;box-shadow:0 5px 12px #75502a12}
+.food .pic{font-size:2.8rem;display:block;margin:2px}
+.food h3{font-size:1.05rem;margin:5px}
+.food small{display:block;margin:5px 0 10px;color:#6d5a46}
+.food button{width:100%;padding:10px 5px}
+.side-tools{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.basket-button{font-size:1rem;background:var(--olive);box-shadow:0 4px 0 #424a26}
+.points{background:#fff;border-radius:12px;padding:10px 14px;font-weight:bold}
+.overlay{display:none;position:fixed;inset:0;background:#241a12a8;z-index:10;padding:18px;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.modal{width:min(100%,520px);max-height:88vh;overflow:auto;background:#fffaf0;border-radius:24px;padding:20px;border:3px solid #e7d3a8}
+.modal h2{margin-top:4px}
+.option{display:block;width:100%;margin:9px 0;text-align:right;background:#f1e3c5;color:#34271c;box-shadow:0 3px 0 #c9b58d}
+.option.selected{background:var(--olive);color:white;box-shadow:0 3px 0 #424a26}
+.feedback{min-height:30px;font-weight:bold;text-align:center}
+.basket-list{padding:0;list-style:none}
+.basket-list li{padding:10px;border-bottom:1px solid #ead8ad}
+.invoice{background:white;color:#28221c;border-radius:8px;padding:22px;box-shadow:0 8px 25px #75502a20}
+.invoice h2{border-bottom:2px dashed #9b8c78;padding-bottom:12px}
+.invoice table{width:100%;border-collapse:collapse;font-size:.9rem}
+.invoice td,.invoice th{padding:9px 5px;border-bottom:1px solid #e6e0d7;text-align:right}
+.invoice th{background:#f6f2ea}
+.good{color:#486329;font-weight:bold}.bad{color:#a13f2e;font-weight:bold}
+.total{font-size:1.2rem;font-weight:bold;text-align:left;margin-top:15px}
+.note{font-size:.85rem;color:#76634e}
+#python-code{direction:ltr;text-align:left;white-space:pre;overflow:auto;background:#211e1a;color:#f9eacb;padding:16px;border-radius:12px;font:12px/1.6 monospace}
+footer{text-align:center;padding:24px 10px;color:#77644c}
+@media(min-width:650px){.shop-layout{grid-template-columns:1fr}.products{grid-template-columns:repeat(3,minmax(0,1fr))}.canteen{min-height:250px}.food .pic{font-size:3.2rem}}
+</style>
+</head>
+<body onload="brython()">
+<section id="welcome" class="page active">
+ <div class="wrap hero">
+  <div class="logo">🏫</div>
+  <h1>مقصف المدرسة</h1>
+  <p class="subtitle">تسوّقي بذكاء، أجيبي عن الأسئلة، واجمعي نقاط الفوز لتحصلي على وجبتك!</p>
+  <button class="olive" id="start">ابدئي اللعب</button>
+  <p class="note">لعبة تعليمية تفاعلية — اختبري معلوماتك واستمتعي بالتسوّق</p>
+ </div>
+</section>
+<section id="player" class="page">
+ <div class="wrap">
+  <div class="hero">
+   <div class="logo">👩🏻‍🎓</div>
+   <div class="panel namebox">
+    <h2>أهلًا بكِ في المقصف</h2>
+    <label for="player-name">اكتبي اسمكِ للبدء</label>
+    <input id="player-name" type="text" maxlength="24" placeholder="اسم الطالبة">
+    <p><button class="onion" id="enter-shop">دخول المقصف</button></p>
+    <p id="name-error" class="bad"></p>
+   </div>
+  </div>
+ </div>
+</section>
+<section id="shop" class="page">
+ <div class="wrap">
+  <div class="topbar">
+   <strong>مرحبًا <span id="hello-name"></span> 🌷</strong>
+   <span class="points">⭐ نقاطك: <span id="score">0</span></span>
+  </div>
+  <div class="canteen">
+   <div class="sign">مقصف مدرستنا</div>
+   <div class="window">
+    <span class="vendor">👩🏻‍🍳</span>
+    <span style="font-size:3.3rem">🥪</span>
+    <span style="font-size:3rem">🧃</span>
+    <div class="counter"></div>
+   </div>
+   <p class="canteen-note">البائعة: أهلًا يا بطلة! اختاري صنفًا وأجيبي عن سؤاله لتحصلي عليه.</p>
+  </div>
+  <div class="side-tools">
+   <button class="basket-button" id="open-basket">🛒 سلة المشتريات (<span id="basket-count">0</span>)</button>
+   <button class="light" id="finish">إنهاء التسوّق وعرض الفاتورة</button>
+  </div>
+  <h2>اختاري من الأصناف</h2>
+  <div id="products" class="products">
+   <article class="food"><span class="pic">🧃</span><h3>العصير</h3><small>السعر: 5 نقاط</small><button data-item="juice">اختاري الصنف</button></article>
+   <article class="food"><span class="pic">🥧</span><h3>الفطيرة</h3><small>السعر: 8 نقاط</small><button data-item="pie">اختاري الصنف</button></article>
+   <article class="food"><span class="pic">🍫</span><h3>الشوكولاتة</h3><small>السعر: 6 نقاط</small><button data-item="chocolate">اختاري الصنف</button></article>
+   <article class="food"><span class="pic">🥗</span><h3>السلطة</h3><small>السعر: 7 نقاط</small><button data-item="salad">اختاري الصنف</button></article>
+   <article class="food"><span class="pic">🍪</span><h3>الكوكيز</h3><small>السعر: 4 نقاط</small><button data-item="cookies">اختاري الصنف</button></article>
+   <article class="food"><span class="pic">🍿</span><h3>الفشار</h3><small>السعر: 5 نقاط</small><button data-item="popcorn">اختاري الصنف</button></article>
+  </div>
+  <p class="note">كل إجابة صحيحة تمنحكِ الصنف ونقاط سعره. يمكنكِ محاولة كل صنف مرة واحدة.</p>
+ </div>
+</section>
+<div id="quiz-overlay" class="overlay">
+ <div class="modal">
+  <h2 id="quiz-title">سؤال الصنف</h2>
+  <p id="quiz-question"></p>
+  <div id="quiz-options"></div>
+  <p id="quiz-feedback" class="feedback"></p>
+  <button class="light" id="close-quiz">إغلاق</button>
+ </div>
+</div>
+<div id="basket-overlay" class="overlay">
+ <div class="modal">
+  <h2>🛒 سلة المشتريات</h2>
+  <ul id="basket-list" class="basket-list"></ul>
+  <p id="basket-empty">لم تضيفي أي صنف بعد. اختاري صنفًا وأجيبي عن سؤاله.</p>
+  <p class="total">مجموع النقاط: <span id="basket-total">0</span></p>
+  <button class="olive" id="close-basket">العودة للمقصف</button>
+ </div>
+</div>
+<section id="invoice-page" class="page">
+ <div class="wrap">
+  <div class="invoice">
+   <h2>🧾 فاتورة مقصف المدرسة</h2>
+   <p>اسم الطالبة: <strong id="invoice-name"></strong></p>
+   <p>نتيجة التحدّي ومشترياتكِ</p>
+   <div style="overflow-x:auto">
+    <table><thead><tr><th>الصنف</th><th>السؤال</th><th>الإجابة</th><th>النقاط</th></tr></thead>
+    <tbody id="invoice-rows"></tbody></table>
+   </div>
+   <p class="total">مجموع نقاط الفوز: <span id="invoice-score">0</span></p>
+   <p id="invoice-message" style="text-align:center;font-weight:bold"></p>
+  </div>
+  <p><button class="olive" id="play-again">العبِي مرة أخرى</button></p>
+ </div>
+</section>
+<footer>
+ <details class="wrap">
+  <summary>عرض كود بايثون مع أرقام الأسطر</summary>
+  <p class="note">هذا هو منطق اللعبة المكتوب بلغة بايثون باستخدام برايثون.</p>
+  <pre id="python-code"></pre>
+ </details>
+</footer>
+<script type="text/python" id="logic">
+from browser import document, html
+
+# بيانات الأصناف والأسئلة والخيارات والإجابة الصحيحة وسعر كل صنف بالنقاط
+items = {
+    "juice": {"name": "العصير", "icon": "🧃", "price": 5,
+              "q": "أي مما يلي يُعد مشروبًا صحيًا عند اختيار عصير طبيعي؟",
+              "opts": ["عصير فواكه دون سكر مضاف", "مشروب غازي", "شراب كثير السكر"], "correct": 0},
+    "pie": {"name": "الفطيرة", "icon": "🥧", "price": 8,
+            "q": "كم يساوي ٦ + ٧؟",
+            "opts": ["١٢", "١٣", "١٤"], "correct": 1},
+    "chocolate": {"name": "الشوكولاتة", "icon": "🍫", "price": 6,
+                  "q": "أي حاسة نستخدم لتذوّق الشوكولاتة؟",
+                  "opts": ["السمع", "البصر", "التذوّق"], "correct": 2},
+    "salad": {"name": "السلطة", "icon": "🥗", "price": 7,
+              "q": "أي مجموعة تُعد مكوّنًا مناسبًا للسلطة؟",
+              "opts": ["الخيار والطماطم", "الحلوى والسكر", "الشوكولاتة والبسكويت"], "correct": 0},
+    "cookies": {"name": "الكوكيز", "icon": "🍪", "price": 4,
+                "q": "ما ناتج ١٥ - ٦؟",
+                "opts": ["٨", "٩", "١٠"], "correct": 1},
+    "popcorn": {"name": "الفشار", "icon": "🍿", "price": 5,
+                "q": "من أي نبات تُصنع حبوب الفشار؟",
+                "opts": ["القمح", "الذرة", "الأرز"], "correct": 1}
+}
+
+# متغيرات تحفظ اسم الطالبة والنتيجة والمشتريات والمحاولات
+player = ""
+score = 0
+basket = []
+attempts = []
+attempted_keys = []
+current_key = ""
+
+# دالة للانتقال بين صفحات اللعبة
+def show_page(page_id):
+    for page in ["welcome", "player", "shop", "invoice-page"]:
+        document[page].classList.remove("active")
+    document[page_id].classList.add("active")
+
+# دالة لتحديث النقاط وعدد الأصناف في السلة
+def update_status():
+    document["score"].text = str(score)
+    document["basket-count"].text = str(len(basket))
+
+# دالة لفتح سؤال الصنف الذي اختارته الطالبة
+def open_question(key):
+    global current_key
+    # لا نسمح بمحاولة الصنف نفسه أكثر من مرة
+    if key in attempted_keys:
+        document["quiz-title"].text = "سبق أن اخترتِ هذا الصنف"
+        document["quiz-question"].text = "انتقلي إلى صنف آخر لإكمال التحدّي."
+        document["quiz-options"].clear()
+        document["quiz-feedback"].text = ""
+        document["quiz-overlay"].classList.add("show")
+        return
+    current_key = key
+    item = items[key]
+    document["quiz-title"].text = "سؤال " + item["name"]
+    document["quiz-question"].text = item["q"]
+    document["quiz-feedback"].text = ""
+    document["quiz-options"].clear()
+    # إنشاء الأزرار باستخدام range لعرض الخيارات الثلاثة
+    for i in range(3):
+        option_button = html.BUTTON(item["opts"][i], Class="option")
+        option_button.bind("click", lambda event, choice=i: check_answer(choice))
+        document["quiz-options"] <= option_button
+    document["quiz-overlay"].classList.add("show")
+
+# دالة تفحص الإجابة وتضيف الصنف عند الإجابة الصحيحة
+def check_answer(choice):
+    global score
+    item = items[current_key]
+    correct = (choice == item["correct"])
+    attempted_keys.append(current_key)
+    attempts.append({"name": item["name"], "question": item["q"],
+                     "correct": correct, "price": item["price"]})
+    if correct:
+        basket.append(current_key)
+        score += item["price"]
+        document["quiz-feedback"].text = "إجابة صحيحة! أُضيف " + item["name"] + " إلى سلتكِ 🌟"
+        document["quiz-feedback"].className = "feedback good"
+    else:
+        document["quiz-feedback"].text = "إجابة غير صحيحة، لن يُضاف الصنف إلى السلة."
+        document["quiz-feedback"].className = "feedback bad"
+    update_status()
+    # تعطيل أزرار الخيارات بعد تسجيل الإجابة
+    for button in document["quiz-options"].select("button"):
+        button.disabled = True
+    document["close-quiz"].text = "متابعة التسوّق"
+
+# دالة لعرض محتويات السلة
+def show_basket(event):
+    document["basket-list"].clear()
+    if len(basket) == 0:
+        document["basket-empty"].style.display = "block"
+    else:
+        document["basket-empty"].style.display = "none"
+    total = 0
+    for key in basket:
+        item = items[key]
+        document["basket-list"] <= html.LI(item["icon"] + " " + item["name"] +
+                                           " — " + str(item["price"]) + " نقاط")
+        total += item["price"]
+    document["basket-total"].text = str(total)
+    document["basket-overlay"].classList.add("show")
+
+# دالة إعداد الفاتورة النهائية لكل الأسئلة
+def make_invoice(event):
+    document["invoice-name"].text = player
+    document["invoice-score"].text = str(score)
+    document["invoice-rows"].clear()
+    for record in attempts:
+        row = html.TR()
+        row <= html.TD(record["name"])
+        row <= html.TD(record["question"])
+        if record["correct"]:
+            answer_text = "صحيحة ✓"
+            answer_class = "good"
+        else:
+            answer_text = "غير صحيحة ✗"
+            answer_class = "bad"
+        cell = html.TD(answer_text)
+        cell.className = answer_class
+        row <= cell
+        row <= html.TD(str(record["price"]) if record["correct"] else "—")
+        document["invoice-rows"] <= row
+    document["invoice-message"].text = "أحسنتِ! نتيجتكِ " + str(score) + " نقطة. شكرًا لتسوّقكِ!"
+    show_page("invoice-page")
+
+# أزرار الانتقال بين الصفحات
+def start_game(event):
+    show_page("player")
+
+def enter_shop(event):
+    global player
+    name = document["player-name"].value.strip()
+    if name == "":
+        document["name-error"].text = "اكتبي اسمكِ أولًا من فضلكِ."
+    else:
+        player = name
+        document["hello-name"].text = player
+        document["name-error"].text = ""
+        show_page("shop")
+
+def close_quiz(event):
+    document["quiz-overlay"].classList.remove("show")
+
+def close_basket(event):
+    document["basket-overlay"].classList.remove("show")
+
+# ربط أزرار الصفحة بوظائف بايثون
+document["start"].bind("click", start_game)
+document["enter-shop"].bind("click", enter_shop)
+document["open-basket"].bind("click", show_basket)
+document["finish"].bind("click", make_invoice)
+document["close-quiz"].bind("click", close_quiz)
+document["close-basket"].bind("click", close_basket)
+
+# ربط أزرار الأصناف الستة بدالة فتح السؤال
+for button in document["products"].select("button"):
+    button.bind("click", lambda event: open_question(event.target.attrs["data-item"]))
+
+# بدء لعبة جديدة وإعادة المتغيرات إلى حالتها الأولى
+def play_again(event):
+    global player, score, basket, attempts, attempted_keys
+    player = ""
+    score = 0
+    basket = []
+    attempts = []
+    attempted_keys = []
+    document["player-name"].value = ""
+    document["close-quiz"].text = "إغلاق"
+    update_status()
+    show_page("welcome")
+
+document["play-again"].bind("click", play_again)
+
+# إظهار نسخة مرقمة من كود بايثون أسفل الصفحة
+source_code = document["logic"].text
+numbered_code = []
+for line_number, line in enumerate(source_code.splitlines(), 1):
+    numbered_code.append(str(line_number).rjust(3, "0") + " | " + line)
+document["python-code"].text = "\n".join(numbered_code)
+</script>
+</body>
+</html>
